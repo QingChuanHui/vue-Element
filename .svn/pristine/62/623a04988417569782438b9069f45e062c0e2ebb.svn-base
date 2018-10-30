@@ -1,0 +1,168 @@
+<template>
+  <div style="height:100%;" >
+    <el-button type="primary" icon="el-icon-plus" @click="partSelect()" size="small">商品选择</el-button>
+    <el-card class="card" v-show="partList.length > 0">
+      <el-table
+        class="partTable"
+        ref="singleTable"
+        :data="partList"
+        highlight-current-row>
+         <el-table-column
+          type="index"
+          width="50">
+        </el-table-column>
+        <!-- <el-table-column
+          property="partCode"
+          label="商品编码"
+          align="center">
+        </el-table-column> -->
+        <el-table-column
+          property="partName"
+          label="商品名称"
+          align="center">
+        </el-table-column>
+        <el-table-column
+          label="数量"
+          align="center"
+          width="150px">
+          <template slot-scope="scope">
+            <el-input-number size="small" v-model="scope.row.amount" controls-position="right" :min="1" :max="100"></el-input-number>
+          </template>
+        </el-table-column>
+        <el-table-column
+          label="操作"
+          align="center"
+          size="mini">
+          <template slot-scope="scope">
+            <i @click="handleClose(scope.row.partId)" class="el-icon-delete del"></i>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-card>
+    <el-dialog title="商品选择" :visible.sync="dialogTableVisible">
+      <div style="height:50px;" class="appCenterTop" > 
+        <el-input  style="width: 250px;" class="filter-item" placeholder="商品名称" v-model="listQuery.partName" size="mini" clearable >
+        </el-input>
+        <el-button style="margin-left:10px;" class="filter-item" type="primary"  icon="el-icon-search"  size="mini" @click="fetchData()" >搜索</el-button>
+      </div>
+      <el-table :data="page.records" v-loading.body="listLoading" @row-click="handleTableChange" element-loading-text="玩命加载中……"  border fit highlight-current-row  stripe size="mini">
+        <el-table-column label="商品名称"  align="center"  >
+          <template slot-scope="scope">
+            {{scope.row.partName}}
+          </template>
+        </el-table-column>
+        <el-table-column label="商品编码"  align="center"  >
+          <template slot-scope="scope">
+            {{scope.row.partCode}}
+          </template>
+        </el-table-column>
+        <el-table-column label="商品价格"  align="center"  >
+          <template slot-scope="scope">
+            {{scope.row.price}}
+          </template>
+        </el-table-column>
+      </el-table>
+      <el-pagination
+        style="margin-top:10px"
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="page.pages"
+        :page-sizes="[20,100, 200, 300, 500, 1000]"
+        :page-size="page.size"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="page.total"
+        background>
+      </el-pagination>
+    </el-dialog>
+  </div>
+</template>
+
+<script>
+import { getPartList } from '@/api/company/part/index'
+export default {
+  props: {
+    companyId: {
+      type: String,
+      default: ''
+    },
+    partList: {
+      type: Array,
+      default: []
+    }
+  },
+  data() {
+    return {
+      dialogTableVisible: false,
+      page: {},
+      listLoading: true,
+      listQuery: {
+        partName: '',
+        pageNo: 1,
+        pageSize: 20
+      }
+    }
+  },
+  methods: {
+    fetchData() {
+      this.listLoading = true
+      getPartList({ 'pageNo': this.listQuery.pageNo, 'pageSize': this.listQuery.pageSize, 'partName': this.listQuery.partName, 'companyId': this.companyId }).then(response => {
+        this.page = response.page
+        this.listLoading = false
+      })
+    },
+    handleSizeChange(val) {
+      this.listQuery.pageSize = val
+      this.fetchData()
+    },
+    handleCurrentChange(val) {
+      this.listQuery.pageNo = val
+      this.fetchData()
+    },
+    partSelect() {
+      this.dialogTableVisible = true
+      this.fetchData()
+    },
+    handleTableChange(row, event, column) {
+      let isColse = false
+      for (let index = 0; index < this.partList.length; index++) {
+        if (this.partList[index].partId === row.id) {
+          this.partList[index].amount += 1
+          isColse = true
+        }
+      }
+      if (!isColse) {
+        this.partList.push({ partId: row.id, partName: row.partName, amount: 1, partCode: row.partCode })
+      }
+      this.dialogTableVisible = false
+      this.returnData()
+    },
+    handleClose(val) {
+      for (let index = 0; index < this.partList.length; index++) {
+        if (this.partList[index].partId === val) {
+          this.partList.splice(index, 1)
+        }
+      }
+      this.returnData()
+    },
+    returnData() {
+      this.$emit('selectSuccess', this.partList)
+    }
+  }
+}
+</script>
+<style scoped>
+  .card{
+    margin: 15px 0;
+    width: 100%
+  }
+  .partTable{
+    margin: 15px 0;
+    width: 100%
+  }
+  .del{
+    color: #606266;
+    font-size: 1.5em;
+    vertical-align: middle;
+    cursor: pointer;
+  }
+</style>

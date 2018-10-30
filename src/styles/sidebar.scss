@@ -1,0 +1,172 @@
+#app {
+  // 主体区域
+  .main-container {
+    height: 100%;// calc(100% - 50px);
+    transition: margin-left .28s;
+    margin-left:200px;
+    // overflow:auto;
+  }
+  .mainshop-container{
+    height: 100%; // calc(100% - 50px);
+    transition: margin-left .28s;
+    margin-left:150px;
+  }
+  .scrollbar-wrapper {
+    height: calc(100% + 15px);
+    .el-scrollbar__view {
+      height: 100%;
+    }
+  }
+
+  // 侧边栏
+  .sidebar-container,.sidebarshop-container {
+    transition: width 0.28s;
+    width: 200px !important;
+    height: 100%; // calc(100% - 50px);
+    position: fixed;
+    font-size: 0px;
+    top: 50;
+    bottom: 0;
+    left: 0;
+    z-index: 1001;
+    overflow: hidden;
+    //reset element-ui css
+    .horizontal-collapse-transition {
+      transition: 0s width ease-in-out, 0s padding-left ease-in-out, 0s padding-right ease-in-out;
+    }
+   
+    .is-horizontal {
+      display: none;
+    }
+    a {
+      display: inline-block;
+      width: 100%;
+      overflow: hidden;
+    }
+    .svg-icon {
+      margin-right: 3px;
+    }
+    .el-menu {
+      border: none;
+      height: calc(100% - 30px);
+      width: 100% !important;
+    }
+  }
+  .sidebarshop-container {
+    width: 150px !important;
+  }
+  .hamburger-container{
+    width: 100%;
+    text-align: center;
+    height:30px;
+    padding-top: 5px;
+    background-color: #52575f;
+  }
+  .hideSidebar {
+    .sidebar-container {
+      width: 90px !important;
+    }
+    .sidebarshop-container{
+      width: 40px !important;
+    }
+    .main-container {
+      margin-left: 90px;
+    }
+    .mainshop-container{
+      margin-left:40px;
+    }
+    .submenu-title-noDropdown {
+      padding-left: 10px !important;
+      position: relative;
+      .el-tooltip {
+        padding: 0 10px !important;
+      }
+    }
+    .el-submenu {
+      overflow: hidden;
+      &>.el-submenu__title {
+        padding-left: 10px !important;
+        .el-submenu__icon-arrow {
+          display: none;
+        }
+      }
+    }
+    .el-menu--collapse {
+      .el-submenu {
+        &>.el-submenu__title {
+          &>span {
+            height: 0;
+            width: 0;
+            overflow: hidden;
+            visibility: hidden;
+            display: inline-block;
+          }
+        }
+      }
+    }
+  }
+  .sidebar-container .cidebarright .is-active{
+    background-color: #fff!important;
+  }
+  // .sidebarshop-container .is-active{
+  //   background-color: #e4e8e6!important;
+  // }
+  .sidebar-container .cidebarright .el-menu-item{
+    &:hover {
+      font-weight: 200;
+    }
+  }
+  .sidebar-container .cidebarright .el-menu-item-group__title{
+    height: 50px;
+    line-height: 50px;
+    padding: 0px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #000;
+    border-bottom: 1px solid #e5e5e5;
+  }
+  .sidebar-container .cidebarleft .is-active{
+    background-color: #f8f8f8!important;
+  }
+  .sidebar-container .cidebarright .is-active{
+    background-color: #f8f8f8!important;
+  }
+  .el-menu--collapse .el-menu .el-submenu {
+    min-width: 90px !important;
+  }
+  .cidebarleft {
+    display:inline-block;
+    width:90px;
+    height: 100%;
+  }
+  .cidebarright {
+    display:inline-block;
+    width: 110px;
+    height: 100%;
+    border-right:solid 1px #e5e5e5;
+    // padding-left: 4px;
+    // padding-right: 1px;
+  }
+  //适配移动端
+  .mobile {
+    .main-container {
+      margin-left: 0px;
+    }
+    .sidebar-container {
+      transition: transform .28s;
+      width: 200px !important;
+    }
+    &.hideSidebar {
+      .sidebar-container {
+        transition-duration: 0.3s;
+        transform: translate3d(-180px, 0, 0);
+      }
+    }
+  }
+  .withoutAnimation {
+    .main-container,
+    .sidebar-container {
+      transition: none;
+    }
+  }
+}

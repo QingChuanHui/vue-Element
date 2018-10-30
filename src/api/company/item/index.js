@@ -1,0 +1,57 @@
+import request from '@/utils/request'
+
+/**
+ * 获取门店项目列表
+ * @param {参数} param
+ */
+export function getCompanyItemList(param) {
+  return request.fetchPost('/v1/item/selectCompanyItemList', param)
+}
+
+/**
+ * 获取门店项目详情
+ * @param {参数} param
+ */
+export function getCompanyItem(param) {
+  return request.fetchPost('/v1/item/selectCompanyItemById', param)
+}
+
+/**
+ * 修改门店项目记录
+ * @param {参数} param
+ */
+export function updCompanyItem(param) {
+  return request.fetchPost('/v1/item/updateCompanyItem', param)
+}
+
+/**
+ * 插入门店项目记录
+ * @param {参数} param
+ */
+export function setCompanyItem(param) {
+  return request.fetchPost('/v1/item/insertCompanyItem', param)
+}
+
+/**
+ * 保存设置
+ * @param {参数} param
+ */
+export function saveCompanyItem(param) {
+  return request.fetchPost('/v1/item/saveCompanyItem', param)
+}
+
+/**
+ * 删除门店项目
+ * @param {参数} param
+ */
+export function delCompanyItem(param) {
+  return request.fetchPost('/v1/item/deleteCompanyItem', param)
+}
+
+/**
+ * 删除门店项目
+ * @param {参数} param
+ */
+export function itemCodeUniqueness(param) {
+  return request.fetchPost('/v1/item/companyItemCodeUniqueness', param)
+}

@@ -1,0 +1,125 @@
+<template>
+  <div>
+  <el-row> 
+    <el-col :span="23"> 
+      <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm"  size="mini" >
+        <el-row>
+          <el-col :span="10">
+            <el-form-item label="项目编码" prop="itemCode">
+              <el-input placeholder="请输入编码" v-model="ruleForm.itemCode" class="input-with-select" :disabled="true" >
+              </el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-row>
+        <el-col :span="10">
+          <el-form-item label="项目名称" prop="itemName">
+            <el-input placeholder="请输入名称" v-model="ruleForm.itemName" :disabled="true"></el-input>
+          </el-form-item>
+        </el-col>
+        </el-row>
+
+        <el-row>
+        <el-col :span="10">
+          <el-form-item label="项目价格">
+            <el-input placeholder="请输入价格 单位/元" v-model="ruleForm.itemPrice"></el-input>
+          </el-form-item>
+        </el-col>
+        </el-row>
+        <el-row>
+        <el-col :span="20">
+          <el-form-item label="对应商品" >
+            <partSelector :companyId="companyId" :partList="ruleForm.baseCompanyItemPartList" @selectSuccess="partSelect"></partSelector>
+          </el-form-item></el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="10">
+        <el-form-item label="备注">
+          <el-input type="textarea" v-model="ruleForm.remarks"></el-input>
+        </el-form-item>
+          </el-col>
+        </el-row>
+        <el-form-item>
+          <el-button type="primary" @click="submitForm('ruleForm')">保存</el-button>
+          <el-button @click="resetForm('ruleForm')">重置</el-button>
+        </el-form-item>
+      </el-form>
+    </el-col>
+  </el-row>  
+  </div>
+</template>
+
+<script>
+  import { getCompanyItem, saveCompanyItem } from '@/api/company/item/index'
+  import { sessionStorageTool } from '@/utils'
+  import partSelector from '../components/partSelector'
+  export default {
+    components: { partSelector },
+    data() {
+      return {
+        itemCode: '',
+        companyId: '',
+        ruleForm: {
+          id: '',
+          itemCode: '',
+          itemName: '',
+          itemPrice: '',
+          companyId: '',
+          baseCompanyItemPartList: [],
+          remarks: ''
+        },
+        rules: {
+          itemName: { required: true, message: '项目名称不允许为空', trigger: 'blur' },
+          itemCode: { required: true, message: '项目编码不允许为空', trigger: 'blur' }
+        }
+      }
+    },
+    mounted: function() {
+      this.$nextTick(function() {
+        const { companyId } = sessionStorageTool.getSessionStorage('companyId')
+        this.companyId = this.ruleForm.companyId = companyId
+        this.itemCode = this.$route.query.itemCode
+        if (this.itemCode) {
+          this.load()
+        }
+      })
+    },
+    methods: {
+      submitForm(formName) {
+        // 提交form
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            saveCompanyItem({ formData: JSON.stringify(this.ruleForm) }).then(response => {
+              this.$router.go(-1)
+            })
+          } else {
+            console.log('error submit!!')
+            return false
+          }
+        })
+      },
+      resetForm(formName) {
+        // 重置表单
+        this.$refs[formName].resetFields()
+      },
+      load() {
+        getCompanyItem({ companyId: this.companyId, itemCode: this.itemCode }).then(response => {
+          this.ruleForm.id = response.new.id
+          this.ruleForm.itemCode = response.new.itemCode
+          this.ruleForm.itemName = response.new.itemName
+          this.ruleForm.itemPrice = response.new.itemPrice
+          this.ruleForm.companyId = response.new.companyId
+          this.ruleForm.remarks = response.new.remarks
+          if (response.new.baseCompanyItemPartList != null) {
+            this.ruleForm.baseCompanyItemPartList = response.new.baseCompanyItemPartList
+          }
+        })
+      },
+      partSelect(data) {
+        this.ruleForm.baseCompanyItemPartList = data
+      }
+    }
+  }
+</script>
+

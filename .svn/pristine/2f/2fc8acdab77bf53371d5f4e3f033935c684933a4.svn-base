@@ -1,0 +1,235 @@
+<template>
+<div>
+  <el-row>
+    <el-col :span="23">
+      <el-form :model="model" :rules="rules" ref="model" label-width="100px" class="demo-ruleForm"  size="mini" >
+        <el-row>
+          <el-col :span="10">
+            <el-form-item label="机构名称" prop="officeName">
+              <el-input placeholder="请输入内容" v-model="model.officeName" class="input-with-select" :disabled="true">
+                <el-button @click="openOfficeDialog()" slot="append" icon="el-icon-search">选择</el-button>
+              </el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="6">
+            <el-form-item label="地址省" prop="province">
+              <el-select v-model="model.province" filterable @change="onProvinceChange" placeholder="请选择省">
+                <el-option v-for="(item,index) in provinceTree" :key="index"  :label="item.name" :value="item.name"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="6">
+            <el-form-item label="地址市"  prop="city">
+              <el-select v-model="model.city" filterable  @change="onCityChange"  placeholder="请选择市">
+                <el-option v-for="(item,index) in cityTree" :key="index"  :label="item.name" :value="item.name"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-form-item label="显示状态">
+          <el-switch v-model="model.isShow" 
+          :active-value="1" 
+          :inactive-value="0"></el-switch>
+        </el-form-item> 
+        <el-form-item label="热门状态">
+          <el-switch v-model="model.isHot" 
+          :active-value="1" 
+          :inactive-value="0"></el-switch>
+        </el-form-item> 
+        <el-row>
+          <el-col :span="10">
+            <el-form-item label="备注">
+              <el-input type="textarea" v-model="model.remarks"></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-form-item v-if="flag!=0">
+          <el-button type="primary" @click="submitForm('model')">提交</el-button>
+          <el-button @click="resetForm('model')">重置</el-button>
+        </el-form-item>
+      </el-form>
+    </el-col>
+  </el-row>
+  <el-dialog title="组织机构" :visible.sync="dialogTableVisible">
+      <el-input
+        placeholder="输入关键字进行过滤"
+        v-model="filterText">
+      </el-input>
+      <el-tree
+        class="filter-tree"
+        :data="officeTree"
+        :props="defaultProps"
+        default-expand-all
+        highlight-current
+        :filter-node-method="filterNode"
+        @node-click="handleNodeClick"
+        ref="tree">
+      </el-tree>
+
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogTableVisible = false" v-loading.fullscreen.lock="fullscreenLoading">取 消</el-button>
+        <el-button type="primary" @click="selectOffice">确 定</el-button>
+      </div>
+    </el-dialog>
+  </div>
+</template>
+
+<script>
+  import { getArea, setArea, updArea } from '@/api/system/area/index'
+  import { getOfficeTreeData } from '@/api/system/office/index'
+  import { getAreaListTree, checkCity } from '@/api/system/area/index'
+  export default {
+    watch: {
+      filterText(val) {
+        this.$refs.tree.filter(val)
+      }
+    },
+    data() {
+      const validateCity = (rule, value, callback) => {
+        checkCity({ 'city': value, 'flag': this.cityFlag }).then(response => {
+          if (response.new) {
+            callback()
+          } else {
+            callback(new Error('该区域已开通'))
+          }
+        })
+      }
+      return {
+        cityFlag: '',
+        flag: '',
+        id: '',
+        model: {
+          city: ''
+        },
+        rules: {
+          province: [
+            { required: true, message: '请选择省份', trigger: 'change' }
+          ],
+          city: [
+            { required: true, message: '请选择城市', trigger: 'change', validator: validateCity }
+          ],
+          officeName: [
+            { required: true, message: '请选择机构', trigger: 'change' }
+          ]
+        },
+        dialogImageUrl: '',
+        dialogVisible: false,
+        dialogTableVisible: false,
+        fullscreenLoading: false,
+        treeSelectData: {
+          treeKey: '',
+          treeValue: ''
+        },
+        provinceTree: [],
+        cityTree: [],
+        officeTree: [],
+        filterText: '',
+        defaultProps: {
+          children: 'children',
+          label: 'label'
+        }
+      }
+    },
+    created() {
+      // 判断有没有ID，有的话带出数据
+      if (this.$route.query.id) {
+        this.id = this.$route.query.id
+        this.load()
+      }
+      this.flag = Number.parseInt(this.$route.query.flag)
+      if (this.$route.query.flag === '1') {
+        this.cityFlag = false
+      } else if (this.$route.query.flag === '2') {
+        this.cityFlag = true
+      }
+      this.getTreeData()
+      this.getAreaData(1, '')
+    },
+    methods: {
+      submitForm(formName) {
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            if (this.id) {
+              updArea(this.model).then(response => {
+                this.$message({
+                  message: '恭喜你，修改成功',
+                  type: 'success'
+                })
+                this.$router.push({ path: 'Area' })
+              })
+            } else {
+              setArea(this.model).then(response => {
+                this.$message({
+                  message: '恭喜你，添加成功',
+                  type: 'success'
+                })
+                this.$router.push({ path: 'Area' })
+              })
+            }
+          } else {
+            console.log('error submit!!')
+            return false
+          }
+        })
+      },
+      resetForm(formName) {
+        this.$refs[formName].resetFields()
+      },
+      load() {
+        getArea({ 'id': this.id }).then(response => {
+          this.model = response.new
+        })
+      },
+      openOfficeDialog() {
+        // 打开机构树形dialog
+        this.dialogTableVisible = true
+      },
+      selectOffice() {
+        // 点击确定以后先关闭当前界面
+        this.dialogTableVisible = false
+        if (this.treeSelectData.treeKey) {
+          this.model.officeId = this.treeSelectData.treeKey
+          this.model.officeName = this.treeSelectData.treeValue
+        }
+      },
+      handleNodeClick(data) {
+        this.treeSelectData.treeKey = data.id
+        this.treeSelectData.treeValue = data.label
+      },
+      getTreeData() {
+        getOfficeTreeData().then(response => {
+          this.officeTree = response.newList
+          console.log(this.officeTree)
+        })
+      },
+      filterNode(value, data) {
+        // 对树节点进行筛选时执行的方法，返回 true 表示这个节点可以显示，返回 false 则表示这个节点会被隐藏
+        if (!value) return true
+        return data.label.indexOf(value) !== -1
+      },
+      onProvinceChange(ele) {
+        console.log(ele)
+        this.model.city = ''
+        this.cityTree = []
+        // 当选择省份以后 获取这个省份下面的所有城市
+        this.getAreaData(2, ele)
+      },
+      onCityChange(ele) {
+        console.log(ele)
+      },
+      getAreaData(kind, name) {
+        // 获取地区信息
+        getAreaListTree({ 'name': name }).then(response => {
+          if (kind === 1) {
+            this.provinceTree = response.newList
+          } else if (kind === 2) {
+            this.cityTree = response.newList
+          }
+        })
+      }
+    }
+  }
+</script>
+

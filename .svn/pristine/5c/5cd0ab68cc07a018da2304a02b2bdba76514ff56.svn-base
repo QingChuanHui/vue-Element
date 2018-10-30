@@ -1,0 +1,167 @@
+<template>
+  <el-row>
+    <el-col :span="23">
+      <el-form :model="model" :rules="rules" ref="model" label-width="100px" class="demo-ruleForm"  size="mini" >
+        <el-row>
+          <el-col :span="10">
+            <el-form-item label="名称" prop="name">
+              <el-input v-model="model.name"></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="10">
+            <el-form-item label="区域" prop="areaId">
+              <el-input v-model="model.areaId"></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="10">
+            <el-form-item label="机构" prop="officeId">
+              <el-input v-model="model.officeId"></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="10">
+            <el-form-item label="图片" prop="imgPath">
+              <!-- <el-upload
+              class="upload-demo"
+              drag
+              action="@/web"
+              limit=1
+              :before-upload="beforeUpload"
+              :multiple="false">
+                <i class="el-icon-upload"></i>
+                <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+                <div class="el-upload__tip" slot="tip">只能上传jpg/png文件，且不超过500kb</div>
+              </el-upload> -->
+               <el-input v-model="model.imgPath"></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="10">
+            <el-form-item label="链接" >
+              <el-input v-model="model.url"></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-form-item label="显示状态">
+          <el-switch v-model="model.isShow" 
+          :active-value="1" 
+          :inactive-value="0"></el-switch>
+        </el-form-item>
+        <el-row>
+          <el-col :span="3">
+            <el-form-item label="排序" >
+              <el-input v-model="model.sortId">99</el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="10">
+            <el-form-item label="备注">
+              <el-input type="textarea" v-model="model.remarks"></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-form-item>
+          <el-button type="primary" @click="submitForm('model')">提交</el-button>
+          <el-button @click="resetForm('model')">重置</el-button>
+        </el-form-item>
+      </el-form>
+    </el-col>
+  </el-row>
+</template>
+
+<script>
+  import { getCarousel, setCarousel, updCarousel } from '@/api/manage/carousel/index'
+  export default {
+    data() {
+      return {
+        id: '',
+        model: {
+        },
+        rules: {
+          name: [
+            { required: true, message: '请输入轮播图名称', trigger: 'blur' },
+            { min: 0, max: 20, message: '最大 20个字符', trigger: 'blur' }
+          ],
+          imgPath: [
+            { required: true, message: '请选择图片', trigger: 'blur' }
+          ],
+          areaId: [
+            { required: true, message: '请选择区域', trigger: 'blur' }
+          ],
+          officeId: [
+            { required: true, message: '请选择机构', trigger: 'blur' }
+          ]
+        }
+      }
+    },
+    created() {
+      // 判断有没有ID，有的话带出数据
+      if (this.$route.query.id) {
+        this.id = this.$route.query.id
+        this.load()
+      }
+    },
+    methods: {
+      submitForm(formName) {
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            if (this.id) {
+              updCarousel(this.model).then(response => {
+                this.$message({
+                  message: '恭喜你，修改成功',
+                  type: 'success'
+                })
+                this.$router.push({ name: 'Carousel' })
+              })
+            } else {
+              setCarousel(this.model).then(response => {
+                this.$message({
+                  message: '恭喜你，添加成功',
+                  type: 'success'
+                })
+                this.$router.push({ name: 'Carousel' })
+              })
+            }
+          } else {
+            console.log('error submit!!')
+            return false
+          }
+        })
+      },
+      resetForm(formName) {
+        this.$refs[formName].resetFields()
+      },
+      load() {
+        getCarousel({ 'id': this.id }).then(response => {
+          this.model = response.carousel
+        })
+      },
+      beforeUpload: function(file) {
+        console.log(file)
+        // 这里是重点，将文件转化为formdata数据上传
+        var fd = new FormData()
+        fd.append('file', file)
+        this.$http.post('@/web', fd).then((res) => {
+          console.log(res)
+        }, (res) => {
+          console.log(res)
+        })
+        return false
+      }
+    }
+  }
+</script>
+
+<style scoped>
+.line{
+  text-align: center;
+}
+</style>
+

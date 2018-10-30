@@ -1,0 +1,140 @@
+<template>
+  <div style="height:100%;" >
+    <div style="height:50px;" class="appCenterTop" > 
+      <el-input  style="width: 250px;" class="filter-item" placeholder="机构名称" v-model="listQuery.name" size="mini" clearable >
+      </el-input>
+      <el-button style="margin-left:10px;" class="filter-item" type="primary"  icon="el-icon-search"  size="mini" @click="fetchData()" >搜索</el-button>
+      <el-button class="filter-item" type="primary"  icon="el-icon-plus"  size="mini"  @click="addT()" >新增</el-button>
+    </div>
+    <el-table :data="page.records" v-loading.body="listLoading" element-loading-text="玩命加载中……"  border fit highlight-current-row  stripe size="mini">
+      <el-table-column label="机构"  align="center"  >
+        <template slot-scope="scope">
+          {{scope.row.officeName}}
+        </template>
+      </el-table-column>
+      <el-table-column label="省"  align="center" >
+        <template slot-scope="scope">
+          {{scope.row.province}}
+        </template>
+      </el-table-column>
+      <el-table-column align="center" label="市"  >
+        <template slot-scope="scope">
+          <span>{{scope.row.city}}</span>
+        </template>
+      </el-table-column>
+       <el-table-column class-name="status-col" label="显示状态"  align="center" width="80">
+        <template slot-scope="scope">
+          <el-tag :type="scope.row.isShow | statusFilter">{{scope.row.isShow == 0 ? "不显示":"显示"}}</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column class-name="status-col" label="热门状态"  align="center" width="80">
+        <template slot-scope="scope">
+          <el-tag :type="scope.row.isHot | hotFilter">{{scope.row.isHot == 0 ? "否":"是"}}</el-tag>
+        </template>
+      </el-table-column>
+     <el-table-column align="center" label="操作" class-name="small-padding fixed-width" width="280">
+        <template slot-scope="scope">
+          <el-button type="primary"  size="mini" @click="handleWatch(scope.row.id)">查看</el-button>
+          <el-button type="success"   size="mini" @click="handleUpdate(scope.row.id)">编辑</el-button>
+          <el-button type="danger" @click="handleDelete(scope.row.id)">删除</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <el-pagination
+      style="margin-top:10px"
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :current-page="page.pages"
+      :page-sizes="[100, 200, 300, 500, 1000]"
+      :page-size="page.size"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="page.total"
+      background>
+    </el-pagination>
+  </div>
+</template>
+
+<script>
+import { getAreaList, delArea } from '@/api/system/area/index'
+export default {
+  data() {
+    return {
+      page: {},
+      listLoading: true,
+      listQuery: {
+        officeName: '',
+        pageNo: 1,
+        pageSize: 100,
+        areaId: '',
+        officeId: '',
+        isShow: ''
+      }
+    }
+  },
+  filters: {
+    statusFilter(status) {
+      const statusMap = {
+        0: 'info',
+        1: 'success'
+      }
+      return statusMap[status]
+    },
+    hotFilter(status) {
+      const statusMap = {
+        0: 'info',
+        1: 'success'
+      }
+      return statusMap[status]
+    }
+  },
+  created() {
+    this.fetchData()
+  },
+  methods: {
+    fetchData() {
+      this.listLoading = true
+      getAreaList({ 'pageNo': this.listQuery.pageNo, 'pageSize': this.listQuery.pageSize, 'officeName': this.listQuery.officeName }).then(response => {
+        this.page = response.page
+        this.listLoading = false
+      })
+    },
+    addT() {
+      this.$router.push({ name: 'AreaAdd', query: { flag: 1 }})
+    },
+    handleUpdate(val) {
+      this.$router.push({ name: 'AreaEdit', query: { 'id': val, flag: 2 }})
+    },
+    handleWatch(val) {
+      this.$router.push({ name: 'AreaWatch', query: { 'id': val, flag: 0 }})
+    },
+    handleSizeChange(val) {
+      this.listQuery.pageSize = val
+      this.fetchData()
+    },
+    handleCurrentChange(val) {
+      this.listQuery.pageNo = val
+      this.fetchData()
+    },
+    handleDelete(val) {
+      this.$confirm('此操作将永久删除该数据, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        delArea({ 'id': val }).then(() => {
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          })
+          this.fetchData()
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
+      })
+    }
+  }
+}
+</script>

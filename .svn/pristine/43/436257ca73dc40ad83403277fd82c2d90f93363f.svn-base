@@ -1,0 +1,187 @@
+const system = {
+  path: '/system',
+  component: resolve => require(['../views/layout/Layout'], resolve),
+  redirect: '/system/Office',
+  name: 'system',
+  meta: { title: '系统', icon: 'example' },
+  children: [
+    {
+      path: 'Office',
+      name: 'Office',
+      component: resolve => require(['@/views/system/office/OfficeList'], resolve),
+      meta: { title: '组织机构维护', fitHeight: 0, breadcrumb: [{ title: '组织机构维护', path: '/system/Office' }], parentpath: '/system/Office' }
+    },
+    {
+      path: 'OfficeAdd',
+      name: 'OfficeAdd',
+      hidden: true,
+      component: resolve => require(['@/views/system/office/OfficeAdd'], resolve),
+      meta: { title: '新增组织机构', fitHeight: 0, breadcrumb: [{ title: '组织机构维护', path: '/system/Office' }, { title: '新增组织机构', path: '/system/OfficeAdd' }], parentpath: '/system/Office' }
+    },
+    {
+      path: 'OfficeUpdate',
+      name: 'OfficeUpdate',
+      hidden: true,
+      component: resolve => require(['@/views/system/office/OfficeAdd'], resolve),
+      meta: { title: '编辑组织机构', fitHeight: 0, breadcrumb: [{ title: '组织机构维护', path: '/system/Office' }, { title: '编辑组织机构', path: '/system/OfficeUpdate' }], parentpath: '/system/Office' }
+    },
+    {
+      path: 'OfficeWatch',
+      name: 'OfficeWatch',
+      hidden: true,
+      component: resolve => require(['@/views/system/office/OfficeAdd'], resolve),
+      meta: { title: '查看组织机构', fitHeight: 0, breadcrumb: [{ title: '组织机构维护', path: '/system/Office' }, { title: '查看组织机构', path: '/system/OfficeWatch' }], parentpath: '/system/Office' }
+    },
+    {
+      path: 'User',
+      name: 'User',
+      component: resolve => require(['@/views/system/user/UserList'], resolve),
+      meta: { title: '操作员维护', fitHeight: 0, breadcrumb: [{ title: '操作员维护', path: '/system/User' }], parentpath: '/system/User' }
+    },
+    {
+      path: 'UserAdd',
+      name: 'UserAdd',
+      hidden: true,
+      component: resolve => require(['@/views/system/user/UserAdd'], resolve),
+      meta: { title: '新增操作员', fitHeight: 0, breadcrumb: [{ title: '操作员维护', path: '/system/User' }, { title: '新增操作员', path: '/system/UserAdd' }], parentpath: '/system/User' }
+    },
+    {
+      path: 'UserUpdate',
+      name: 'UserUpdate',
+      hidden: true,
+      component: resolve => require(['@/views/system/user/UserAdd'], resolve),
+      meta: { title: '编辑操作员', fitHeight: 0, breadcrumb: [{ title: '操作员维护', path: '/system/User' }, { title: '编辑操作员', path: '/system/UserAdd' }], parentpath: '/system/User' }
+    },
+    {
+      path: 'UserWatch',
+      name: 'UserWatch',
+      hidden: true,
+      component: resolve => require(['@/views/system/user/UserAdd'], resolve),
+      meta: { title: '查看操作员', fitHeight: 0, breadcrumb: [{ title: '操作员维护', path: '/system/User' }, { title: '查看操作员', path: '/system/UserAdd' }], parentpath: '/system/User' }
+    },
+    {
+      path: 'UserMenu',
+      name: 'UserMenu',
+      hidden: true,
+      component: resolve => require(['@/views/system/user/UserMenu'], resolve),
+      meta: {
+        title: '权限设置',
+        breadcrumb: [{
+          title: '操作员维护',
+          path: '/system/User'
+        }, {
+          title: '权限设置',
+          path: '/system/UserMenu'
+        }],
+        parentpath: '/system/User'
+      }
+    },
+    {
+      path: 'Role',
+      name: 'Role',
+      component: resolve => require(['@/views/system/role/RoleList'], resolve),
+      meta: { title: '角色维护', breadcrumb: [{ title: '角色维护', path: '/system/Role' }], parentpath: '/system/Role' }
+    },
+    {
+      path: 'RoleAdd',
+      name: 'RoleAdd',
+      hidden: true,
+      component: resolve => require(['@/views/system/role/RoleAdd'], resolve),
+      meta: { title: '新增角色', breadcrumb: [{ title: '角色维护', path: '/system/Role' }, { title: '新增角色', path: '/system/RoleAdd' }], parentpath: '/system/Role' }
+    },
+    {
+      path: 'RoleUpdate',
+      name: 'RoleUpdate',
+      hidden: true,
+      component: resolve => require(['@/views/system/role/RoleAdd'], resolve),
+      meta: { title: '编辑角色', breadcrumb: [{ title: '角色维护', path: '/system/Role' }, { title: '编辑角色', path: '/system/RoleAdd' }], parentpath: '/system/Role' }
+    },
+    {
+      path: 'RoleWatch',
+      name: 'RoleWatch',
+      hidden: true,
+      component: resolve => require(['@/views/system/role/RoleAdd'], resolve),
+      meta: { title: '查看角色', breadcrumb: [{ title: '角色维护', path: '/system/Role' }, { title: '查看角色', path: '/system/RoleAdd' }], parentpath: '/system/Role' }
+    },
+    {
+      path: 'RoleMenu',
+      name: 'RoleMenu',
+      hidden: true,
+      component: resolve => require(['@/views/system/role/RoleMenu'], resolve),
+      meta: {
+        title: '权限设置',
+        breadcrumb: [{
+          title: '角色维护',
+          path: '/system/Role'
+        }, {
+          title: '权限设置',
+          path: '/system/RoleMenu'
+        }],
+        parentpath: '/system/Role'
+      }
+    },
+    {
+      path: 'Area',
+      name: 'Area',
+      component: resolve => require(['@/views/system/area/list'], resolve),
+      meta: {
+        title: '区域维护',
+        breadcrumb: [{
+          title: '区域维护',
+          path: '/system/Area'
+        }],
+        parentpath: '/system/Area'
+      }
+    }, {
+      path: 'AreaAdd',
+      name: 'AreaAdd',
+      hidden: true,
+      component: resolve => require(['@/views/system/area/edit'], resolve),
+      meta: {
+        title: '新增',
+        breadcrumb: [{
+          title: '区域维护',
+          path: '/system/Area'
+        }, {
+          title: '新增',
+          path: '/system/AreaAdd'
+        }],
+        parentpath: '/system/Area'
+      }
+    }, {
+      path: 'AreaEdit',
+      name: 'AreaEdit',
+      hidden: true,
+      component: resolve => require(['@/views/system/area/edit'], resolve),
+      meta: {
+        title: '编辑',
+        breadcrumb: [{
+          title: '区域维护',
+          path: '/system/Area'
+        }, {
+          title: '编辑',
+          path: '/system/AreaEdit'
+        }],
+        parentpath: '/system/Area'
+      }
+    }, {
+      path: 'AreaWatch',
+      name: 'AreaWatch',
+      hidden: true,
+      component: resolve => require(['@/views/system/area/edit'], resolve),
+      meta: {
+        title: '查看',
+        breadcrumb: [{
+          title: '区域维护',
+          path: '/system/Area'
+        }, {
+          title: '查看',
+          path: '/system/AreaWatch'
+        }],
+        parentpath: '/system/Area'
+      }
+    }
+
+  ]
+}
+export default system

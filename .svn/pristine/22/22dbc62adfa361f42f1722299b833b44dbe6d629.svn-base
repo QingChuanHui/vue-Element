@@ -1,0 +1,29 @@
+const base = {
+  path: '/base',
+  component: resolve => require(['../views/layout/Layout'], resolve),
+  redirect: '/base/table',
+  name: 'Example',
+  meta: { title: '基础', icon: 'example' },
+  children: [
+    {
+      path: 'table',
+      name: 'Table',
+      component: resolve => require(['@/views/table/index'], resolve),
+      meta: { title: '列表', fitHeight: 1, breadcrumb: [{ title: '列表', path: '/base/table' }], parentpath: '/base/table' }
+    },
+    {
+      path: 'tableAdd',
+      name: 'tableAdd',
+      hidden: true,
+      component: resolve => require(['@/views/table/tableAdd'], resolve),
+      meta: { title: '新增', fitHeight: 0, breadcrumb: [{ title: '列表', path: '/base/table' }, { title: '新增', path: '/base/tableAdd' }], parentpath: '/base/table' }
+    },
+    {
+      path: 'tree',
+      name: 'Tree',
+      component: resolve => require(['@/views/tree/index'], resolve),
+      meta: { title: '优惠券', breadcrumb: [{ title: '优惠券', path: '/base/tree' }], parentpath: '/base/tree' }
+    }
+  ]
+}
+export default base

@@ -1,0 +1,47 @@
+const manage = {
+  path: '/manage',
+  component: resolve => require(['../views/layout/Layout'], resolve),
+  redirect: '/manage/Carousel',
+  name: 'manage',
+  meta: { title: '运营', icon: 'example' },
+  children: [
+    {
+      path: 'Carousel',
+      name: 'Carousel',
+      component: resolve => require(['@/views/manage/carousel/list'], resolve),
+      meta: { title: '轮播图管理', fitHeight: 0, breadcrumb: [{ title: '轮播图维护', path: '/manage/carousel' }], parentpath: '/manage/carousel' }
+    },
+    {
+      path: 'carouselEdit',
+      name: 'carouselEdit',
+      hidden: true,
+      component: resolve => require(['@/views/manage/carousel/edit'], resolve),
+      meta: {
+        title: '新增',
+        fitHeight: 0,
+        breadcrumb: [{
+          title: '列表',
+          path: '/manage/carousel'
+        }, {
+          title: '新增',
+          path: '/manage/carouselEdit'
+        }],
+        parentpath: '/manage/carousel'
+      }
+    }
+    // {
+    //   path: 'HomeKind',
+    //   name: 'HomeKind',
+    //   // hidden: true,
+    //   component: resolve => require(['@/views/manage/HomeKindList'], resolve),
+    //   meta: { title: '首页类别', fitHeight: 0, breadcrumb: [{ title: '首页类别', path: '/manage/HomeKind' }], parentpath: '/manage/HomeKind' }
+    // },
+    // {
+    //   path: 'NewsList',
+    //   name: 'NewsList',
+    //   component: resolve => require(['@/views/manage/NewsList'], resolve),
+    //   meta: { title: '头条维护', fitHeight: 0, breadcrumb: [{ title: '头条维护', path: '/manage/NewsList' }], parentpath: '/manage/NewsList' }
+    // }
+  ]
+}
+export default manage

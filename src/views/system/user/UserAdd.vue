@@ -1,0 +1,262 @@
+<template>
+  <div class="useradd">
+  <el-row>
+    <el-col :span="23">
+      <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm"  size="mini" >
+  
+        <el-row v-if="!userUpd">
+          <el-col :span="10">
+            <el-form-item label="机构名称" prop="officeName">
+              <officeSelector :officeName="ruleForm.officeName" @selectSuccess="selectOffice"></officeSelector>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="10">
+            <el-form-item label="头像" prop="headImage">
+              <el-upload
+              :class="{disabled:uploadDisabled}"
+              :action="action"
+              :limit="1"
+              :before-upload="beforeUpload"
+              :on-success="onSuccess"
+              list-type="picture-card"
+              :on-preview="handlePictureCardPreview"
+              :on-remove="handleRemove"
+              :multiple="false"
+              accept="image/gif,image/jpeg,image/jpg,image/png,image/svg"
+              :file-list="imagelist">
+                <i class="el-icon-plus"></i>
+              </el-upload>
+              <el-dialog :visible.sync="dialogVisible">
+                <img width="100%" :src="dialogImageUrl" alt="">
+              </el-dialog>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="10">
+            <el-form-item label="姓名" prop="name">
+              <el-input v-model="ruleForm.name"   ></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row v-if="!userUpd">
+        <el-col :span="10" >
+          <el-form-item label="登录编码" prop="loginName">
+            <el-input v-model="ruleForm.loginName"></el-input>
+          </el-form-item>
+        </el-col>
+        </el-row>
+
+        <el-row v-if="!userUpd">
+        <el-col :span="10">
+          <el-form-item label="密码" prop="password">
+            <el-input v-model="ruleForm.password"></el-input>
+          </el-form-item>
+        </el-col>
+        </el-row>
+
+        <el-row>
+        <el-col :span="10">
+          <el-form-item prop="address" label="性别" >
+           <el-select v-model="ruleForm.sex" placeholder="请选择">
+              <el-option
+                v-for="item in sexList"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item></el-col>
+        </el-row>
+
+        <el-row>
+          <el-col :span="10">
+            <el-form-item prop="adminName" label="手机号" >
+              <el-input v-model="ruleForm.mobile"  ></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+       <el-row v-if="!userUpd">
+          <el-col :span="10">
+             <el-form-item label="禁用">
+                <el-switch v-model="ruleForm.useFlag" :active-value="1" :inactive-value="0"></el-switch>
+             </el-form-item>
+          </el-col>
+        </el-row> 
+        <el-row v-if="!userUpd">
+          <el-col :span="10">
+        <el-form-item label="备注" prop="remarks">
+          <el-input type="textarea" v-model="ruleForm.remarks"></el-input>
+        </el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-form-item v-if="flag!=0">
+          <el-button type="primary" @click="submitForm('ruleForm')">保存</el-button>
+          <el-button @click="resetForm('ruleForm')">重置</el-button>
+        </el-form-item>
+      </el-form>
+    </el-col>
+  </el-row>
+  </div>
+</template>
+
+<script>
+  import { loginNameUniqueness, selectUser, saveUser, updateUser } from '@/api/system/user/index'
+  import officeSelector from '../components/officeSelector'
+  export default {
+    components: { officeSelector },
+    computed: {
+      uploadDisabled: function() {
+        return this.imagelist.length > 0
+      }
+    },
+    data() {
+      var validateLoginName = (rule, value, callback) => {
+        if (value === '') {
+          callback(new Error('请输入登录编码'))
+        }
+        if (this.flag === 2) {
+          this.flagUpdate = true
+        }
+        // 异步检查loginName 是否允许重复
+        loginNameUniqueness({ 'loginName': value, 'flag': this.flagUpdate }).then(response => {
+          if (response.new) {
+            callback(new Error('该账号已经被使用'))
+          } else {
+            callback()
+          }
+        })
+      }
+      return {
+        // 图片的属性
+        dialogVisible: false,
+        dialogImageUrl: '',
+        imagelist: [],
+        action: process.env.BASE_API + '/v1/upload',
+        picUrl: process.env.BASE_API,
+        model: {},
+        sexList: [{ value: '男', label: '男' }, { value: '女', label: '女' }],
+        flagUpdate: false,
+        id: '',
+        flag: 0,
+        userUpd: '',
+        ruleForm: {
+          id: '',
+          name: '',
+          password: '',
+          loginName: '',
+          sex: '',
+          mobile: '',
+          headImage: '',
+          officeName: '',
+          remarks: '',
+          useFlag: 0,
+          officeId: ''
+        },
+        rules: {
+          name: [
+            { required: true, message: '请输入姓名', trigger: 'blur' },
+            { min: 0, max: 20, message: '最大 64个字符', trigger: 'blur' }
+          ],
+          password: [
+            { required: true, message: '请输入密码', trigger: 'blur' },
+            { min: 0, max: 20, message: '最大 64个字符', trigger: 'blur' }
+          ],
+          loginName: [
+            { validator: validateLoginName, trigger: 'blur' }
+          ]
+        }
+      }
+    },
+    mounted: function() {
+      this.$nextTick(function() {
+        this.userUpd = this.$route.query.userUpd
+        // flag==0 表示查看 flag=1表示需改
+        this.id = this.$route.query.id
+        if (this.id) {
+          this.load()
+        }
+        this.flag = Number.parseInt(this.$route.query.flag)
+      })
+    },
+    methods: {
+      submitForm(formName) {
+        // 提交form
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            // 新增 flag===1
+            if (this.flag === 1) {
+              saveUser(this.ruleForm).then(response => {
+                console.log('ok')
+                this.$router.push({ path: '/system/User' })
+              })
+            // 修改 flag===2
+            } else if (this.flag === 2) {
+              updateUser(this.ruleForm).then(response => {
+                console.log('ok')
+                this.$router.push({ path: '/system/User' })
+              })
+            } else {
+              console.log('error submit!!:' + this.flag)
+            }
+          } else {
+            console.log('error submit!!')
+            return false
+          }
+        })
+      },
+      resetForm(formName) {
+        // 重置表单
+        this.$refs[formName].resetFields()
+      },
+      load() {
+        selectUser({ 'id': this.id }).then(response => {
+          this.ruleForm = response.new
+          if (this.ruleForm.headImage) {
+            this.imagelist.push({ url: this.picUrl + this.ruleForm.headImage })
+          }
+        })
+      },
+      selectOffice(data) {
+        if (data.treeKey) {
+          this.ruleForm.officeId = data.treeKey
+          this.ruleForm.officeName = data.treeValue
+        }
+      },
+      beforeUpload: function(file) {
+        console.log('beforeupload')
+      },
+      onSuccess: function(response, file, fileList) {
+        console.log('success')
+        console.log(response)
+        this.ruleForm.headImage = response.url
+        this.imagelist.push(file)
+      },
+      handleRemove(file, fileList) {
+        console.log('remove')
+        this.imagelist = []
+      },
+      handlePictureCardPreview(file) {
+        console.log('preview')
+        this.dialogImageUrl = file.url
+        this.dialogVisible = true
+      }
+    }
+  }
+</script>
+
+<style lang="scss">
+.useradd{
+  .line{
+    text-align: center;
+  }
+  .disabled .el-upload--picture-card {
+        display: none;
+  }
+}
+ 
+</style>
+

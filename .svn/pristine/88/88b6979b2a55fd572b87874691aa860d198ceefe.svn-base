@@ -1,0 +1,34 @@
+const system = {
+  path: '/system',
+  component: resolve => require(['../views/layout/Layout'], resolve),
+  redirect: '/system/Office',
+  name: 'system',
+  meta: { title: '系统', icon: 'example' },
+  children: [
+    {
+      path: 'Office',
+      name: 'Office',
+      component: resolve => require(['@/views/system/office/OfficeList'], resolve),
+      meta: { title: '组织机构维护', fitHeight: 0, breadcrumb: [{ title: '组织机构维护', path: '/system/Office' }], parentpath: '/system/Office' }
+    },
+    {
+      path: 'OfficeAdd',
+      name: 'OfficeAdd',
+      component: resolve => require(['@/views/system/office/OfficeAdd'], resolve),
+      meta: { title: '新增组织机构', fitHeight: 0, breadcrumb: [{ title: '组织机构维护', path: '/system/Office' }, { title: '新增组织机构', path: '/system/OfficeAdd' }], parentpath: '/system/Office' }
+    },
+    {
+      path: 'User',
+      name: 'User',
+      component: resolve => require(['@/views/system/UserList'], resolve),
+      meta: { title: '操作员维护', fitHeight: 0, breadcrumb: [{ title: '列表', path: '/system/User' }, { title: '新增', path: '/system/User' }], parentpath: '/system/User' }
+    },
+    {
+      path: 'Role',
+      name: 'Role',
+      component: resolve => require(['@/views/system/RoleList'], resolve),
+      meta: { title: '角色维护', breadcrumb: [{ title: '优惠券', path: '/system/Role' }], parentpath: '/system/Role' }
+    }
+  ]
+}
+export default system

@@ -1,0 +1,110 @@
+<template>
+  <section class="app-main">
+    <div  class="appMainTop" >
+      <breadcrumb class="breadcrumb-container"  :breadcrumb="$route.meta.breadcrumb" ></breadcrumb>
+      <el-dropdown class="avatar-container" trigger="click">
+        <div class="avatar-wrapper">
+          <img class="user-avatar" :src="picUrl + userInfo.headImage">
+          <i class="el-icon-caret-bottom"></i>
+        </div>
+        <el-dropdown-menu class="user-dropdown" slot="dropdown"  >
+        <router-link class="inlineBlock" to="/">
+          <el-dropdown-item>
+            <i class="iconfont icon-geren1" style="font-size:14px"></i>
+            主页
+          </el-dropdown-item>
+        </router-link>
+        <el-dropdown-item divided>
+          
+          <span @click="logout" style="display:block;"><i style="font-size:14px" class="iconfont icon-tuichu"></i>&nbsp;退出</span>
+        </el-dropdown-item>
+      </el-dropdown-menu>
+      </el-dropdown>
+    </div>
+    <tags-view></tags-view>
+    <transition name="fade" mode="out-in">
+      <router-view  class="app-container"  :style="cssH" ></router-view>
+    </transition>
+  </section>
+</template>
+
+<script>
+import { mapGetters } from 'vuex'
+import Breadcrumb from '@/components/Breadcrumb'
+import TagsView from './TagsView'
+export default {
+  components: {
+    Breadcrumb,
+    TagsView
+  },
+  name: 'AppMain',
+  computed: {
+    ...mapGetters([
+      // 'sidebar',
+      'userInfo'
+    ])
+  },
+  data() {
+    return {
+      cssH: {},
+      picUrl: process.env.BASE_API
+    }
+  },
+  methods: {
+    fitHeight() {
+      if (this.$route.meta && this.$route.meta.fitHeight) { // 判断是否是自适应高度返回高度数据
+        this.cssH = { 'height': window.innerHeight - 120 + 'px' }
+      } else {
+        this.cssH = {}
+      }
+    },
+    logout() {
+      this.$store.dispatch('FedLogOut').then(() => {
+        location.reload() // 为了重新实例化vue-router对象 避免bug
+      })
+    }
+  },
+  watch: {
+    '$route'(to, from) { // 路由变化判断是否需要设置高度
+      this.fitHeight()
+    }
+  },
+  mounted() {
+    this.fitHeight()
+    var _this = this
+    window.onresize = function() { // 监听窗体变化事件
+      _this.fitHeight()
+    }
+  }
+}
+</script>
+<style rel="stylesheet/scss" lang="scss" scoped>
+.avatar-container {
+    height: 50px;
+    display: inline-block;
+    position: absolute;
+    right: 35px;
+    .avatar-wrapper {
+      cursor: pointer;
+      margin-top: 5px;
+      position: relative;
+      .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+      }
+      .el-icon-caret-bottom {
+        position: absolute;
+        right: -20px;
+        top: 20px;
+        font-size: 18px;
+        color:#a0a2a5;
+        font-size: 14px;
+      }
+    }
+  }
+  .user-dropdown{
+    width: 70px;
+    text-align: center;
+  }
+</style>

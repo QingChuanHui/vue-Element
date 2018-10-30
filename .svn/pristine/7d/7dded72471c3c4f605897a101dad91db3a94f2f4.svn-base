@@ -1,0 +1,53 @@
+import Vue from 'vue'
+import Router from 'vue-router'
+// import yingxiao from './yingxiao'
+// import user from './user'
+import system from './system'
+import manage from './manage'
+import order from './order'
+import base from './base'
+
+Vue.use(Router)
+
+/* Layout */
+// import Layout from '../views/layout/Layout'
+const Layout = resolve => require(['../views/layout/Layout'], resolve)
+/**
+* hidden: true 不显示菜单
+* alwaysShow: true               if set true, will always show the root menu, whatever its child routes length
+*                                if not set alwaysShow, only more than one route under the children
+*                                it will becomes nested mode, otherwise not show the root menu
+* redirect: noredirect          重定向
+* name:'router-name'             the name is used by <keep-alive> (must set!!!)
+breadcrumb 面包屑的数据
+parentpath 二级以下必须写，子界面路由显示时选择的左侧菜单
+**/
+export const constantRouterMap = [
+  { path: '/login', component: resolve => require(['@/views/login/index'], resolve), hidden: true },
+  { path: '/loginIndex', component: resolve => require(['@/views/login/login'], resolve), hidden: true },
+  { path: '/404', component: resolve => require(['@/views/404'], resolve), hidden: true },
+  {
+    path: '/',
+    component: Layout,
+    redirect: '/dashboard',
+    name: 'Dashboard',
+    meta: { title: '主页', icon: 'example', funCode: 100001 },
+    children: [{
+      path: 'dashboard',
+      meta: { title: '主页', parentpath: '/', breadcrumb: [{ title: '主页', path: '' }], funCode: 100001 },
+      component: resolve => require(['@/views/dashboard/index'], resolve)
+    }]
+  },
+  manage,
+  order,
+  base,
+  system,
+  { path: '*', redirect: '/404', hidden: true }
+]
+
+export default new Router({
+  // mode: 'history', //后端支持可开
+  scrollBehavior: () => ({ y: 0 }),
+  routes: constantRouterMap
+})
+

@@ -1,0 +1,126 @@
+<template>
+  <div  class="cidebar" >
+    <el-scrollbar wrapClass="scrollbar-wrapper" class="cidebarleft" >
+      <el-menu
+        mode="vertical"
+        :show-timeout="200"
+        :default-active="selectleftM.path"
+        background-color="#444"
+        text-color="#cacaca"
+        active-text-color="#333"
+      >
+       <!-- :collapse="isCollapse"  EAEDF1 -->
+        <el-menu-item v-for="(item,i) in routes"  :key="i" v-if="!item.hidden&&isShowMenu(item.meta)"  :index="item.path"  @click="urlPath(item)" style="height:45px;line-height:45px;"  >
+          <svg-icon v-if="item.meta&&item.meta.icon" :icon-class="item.meta.icon"></svg-icon>
+          <span v-if="item.meta&&item.meta.title" slot="title">{{item.meta.title}}</span>
+        </el-menu-item>
+      </el-menu>
+    </el-scrollbar>
+    <el-scrollbar wrapClass="scrollbar-wrapper" class="cidebarright"  >
+      <el-menu
+        mode="vertical"
+        :show-timeout="200"
+        :default-active="$route.meta.parentpath"
+        background-color="#fff"
+        text-color="#666"
+        active-text-color="#666"
+      >
+        <el-menu-item-group   >
+          <template slot="title"   >{{selectleftM.meta.title}}</template>
+          <template v-for="child in selectleftM.children" >
+            <router-link  :to="selectleftM.path+'/'+child.path" :key="child.name"  v-if="!child.hidden&&isShowMenu(child.meta)" >
+              <el-menu-item :index="selectleftM.path+'/'+child.path"  style="height:35px;line-height:35px;" >
+                <span v-if="child.meta&&child.meta.title" slot="title">{{child.meta.title}}</span>
+              </el-menu-item>
+            </router-link>
+          </template>
+        </el-menu-item-group>
+      </el-menu>
+    </el-scrollbar>
+    <!-- <hamburger class="hamburger-container" :toggleClick="toggleSideBar" :isActive="sidebar.opened"></hamburger> -->
+  </div>
+</template>
+
+<script>
+import { mapGetters } from 'vuex'
+import SidebarItem from './SidebarItem'
+import { isHaveMenu } from '@/utils/handle'
+// import Hamburger from '@/components/Hamburger'
+export default {
+  components: { SidebarItem },
+  data() {
+    return {
+      selectleftM: {
+        path: '/',
+        children: [],
+        meta: {}
+      } // 选择的一级菜单
+    }
+  },
+  watch: {
+    '$route'(to, from) {
+      if (this.$route.matched.length > 0) { // 一级菜单的选择
+        this.menuHandler(this.$route.matched[0].path)
+      }
+    }
+  },
+  methods: {
+    isShowMenu(meta) {
+      if (meta.funCode) {
+        return isHaveMenu(meta.funCode)
+      }
+      return true
+    },
+    toggleSideBar() {
+      this.$store.dispatch('ToggleSideBar')
+    },
+    urlPath(item) {
+      if (item.path === '/') {
+        this.$router.push({ path: '/' })
+        if (this.sidebar.opened) { // 初始化如果是打开的关闭
+          this.toggleSideBar()
+        }
+      } else {
+        this.selectleftM = item
+        if (!this.sidebar.opened) { // 初始化如果是打开的关闭
+          this.toggleSideBar()
+        }
+      }
+    },
+    menuHandler(path) {
+      const parentP = this.$router.options.routes.filter((item) => {
+        return item.path === path
+      })
+      if (parentP.length > 0) {
+        this.selectleftM = parentP[0]
+      }
+    }
+  },
+  mounted() {
+    if (this.$route.matched.length > 0) {
+      this.menuHandler(this.$route.matched[0].path)
+    }
+    if (this.$route.path === '/dashboard') { // 主页
+      if (this.sidebar.opened) { // 初始化如果是打开的关闭
+        this.toggleSideBar()
+      }
+    } else {
+      if (!this.sidebar.opened) { // 初始化如果是打开的关闭
+        this.toggleSideBar()
+      }
+    }
+  },
+  computed: {
+    ...mapGetters([
+      'sidebar'
+    ]),
+    routes() {
+      return this.$router.options.routes
+    }
+    // isCollapse() {
+    //   return !this.sidebar.opened
+    // }
+  }
+}
+</script>
+

@@ -1,0 +1,51 @@
+<template>
+  <section class="app-main">
+    <div  class="appMainTop" >
+      <breadcrumb class="breadcrumb-container"  :breadcrumb="$route.meta.breadcrumb" ></breadcrumb>
+    </div>
+    <transition name="fade" mode="out-in">
+      <router-view  class="app-container"  :style="cssH" ></router-view>
+    </transition>
+  </section>
+</template>
+
+<script>
+import Breadcrumb from '@/components/Breadcrumb'
+export default {
+  components: {
+    Breadcrumb
+  },
+  name: 'AppMain',
+  // computed: {
+  //   topName() {
+  //     return this.$route.meta !== undefined ? this.$route.meta.title : ''
+  //   }
+  // },
+  data() {
+    return {
+      cssH: {}
+    }
+  },
+  methods: {
+    fitHeight() {
+      if (this.$route.meta && this.$route.meta.fitHeight) { // 判断是否是自适应高度返回高度数据
+        this.cssH = { 'height': window.innerHeight - 120 + 'px' }
+      } else {
+        this.cssH = {}
+      }
+    }
+  },
+  watch: {
+    '$route'(to, from) { // 路由变化判断是否需要设置高度
+      this.fitHeight()
+    }
+  },
+  mounted() {
+    this.fitHeight()
+    var _this = this
+    window.onresize = function() { // 监听窗体变化事件
+      _this.fitHeight()
+    }
+  }
+}
+</script>

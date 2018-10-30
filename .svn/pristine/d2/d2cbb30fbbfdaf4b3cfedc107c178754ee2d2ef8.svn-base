@@ -1,0 +1,65 @@
+<template>
+  <el-scrollbar wrapClass="scrollbar-wrapper">
+    <hamburger class="hamburger-container" :toggleClick="toggleSideBar" :isActive="sidebar.opened"></hamburger>
+    <el-menu
+      mode="vertical"
+      :show-timeout="200"
+      :default-active="$route.meta.parentpath"
+      :collapse="isCollapse"
+      background-color="#304156"
+      text-color="#bfcbd9"
+      active-text-color="#409EFF"
+    >
+      <SidebarItem :routes="showRouter"></SidebarItem>
+    </el-menu>
+  </el-scrollbar>
+</template>
+
+<script>
+import SidebarItem from './SidebarItem'
+import { shopRouterMap } from '@/router'
+import { mapGetters } from 'vuex'
+import Hamburger from '@/components/Hamburger'
+export default {
+  components: { SidebarItem, Hamburger },
+  data() {
+    return {
+      shopRouterMap: shopRouterMap,
+      showRouter: [] // 显示的菜单项
+    }
+  },
+  watch: {
+    '$route'(to, from) {
+      if (from.matched.length > 0 && to.matched.length > 0) {
+        if (from.matched[0].meta.MenuGroup !== to.matched[0].meta.MenuGroup) { // 改变菜单
+          this.bandMenuS(to.matched[0].meta.MenuGroup)
+        }
+      }
+    }
+  },
+  methods: {
+    toggleSideBar() {
+      this.$store.dispatch('ToggleSideBar')
+    },
+    bandMenuS(menuGroup) {
+      this.showRouter = this.shopRouterMap.filter((item) => {
+        return item.meta && item.meta.MenuGroup && item.meta.MenuGroup === menuGroup
+      })
+    }
+  },
+  mounted() {
+    if (!this.sidebar.opened) { // 初始化如果是打开的关闭
+      this.toggleSideBar()
+    }
+    this.bandMenuS(this.$route.matched[0].meta.MenuGroup)
+  },
+  computed: {
+    ...mapGetters([
+      'sidebar'
+    ]),
+    isCollapse() {
+      return !this.sidebar.opened
+    }
+  }
+}
+</script>

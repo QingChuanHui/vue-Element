@@ -1,0 +1,178 @@
+<template>
+  <el-row>
+    <el-col :span="23">
+      <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm"  size="mini" >
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="企业名称" prop="name">
+              <el-input v-model="ruleForm.name"   ></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12"></el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="6">
+            <el-form-item prop="region" label="客户类型" >
+              <el-select v-model="ruleForm.region" placeholder="请选择客户类型">
+                <el-option label="vip" value="vip"></el-option>
+                <el-option label="客户2" value="kehu2"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="6"> 
+            <el-form-item label="负责人" prop="MASTER">
+              <el-input v-model="ruleForm.MASTER"></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="6">
+            <el-form-item label="负责人电话" prop="PHONE">
+              <el-input v-model="ruleForm.PHONE"></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="6">
+            <el-form-item label="负责人电话" prop="PHONE">
+              <el-input v-model="ruleForm.PHONE"></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="6">
+            <el-form-item label="地址省" prop="name">
+              <el-select v-model="ruleForm.region" placeholder="请选择省">
+                <el-option label="vip" value="vip"></el-option>
+                <el-option label="客户2" value="kehu2"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+           <el-col :span="6">
+            <el-form-item label="地址市" prop="name">
+              <el-select v-model="ruleForm.region" placeholder="请选择市">
+                <el-option label="vip" value="vip"></el-option>
+                <el-option label="客户2" value="kehu2"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+           <el-col :span="6">
+            <el-form-item label="地址县" prop="name">
+              <el-select v-model="ruleForm.region" placeholder="请选择县">
+                <el-option label="vip" value="vip"></el-option>
+                <el-option label="客户2" value="kehu2"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="6">
+            <el-form-item prop="MASTER" label="街道地址" >
+              <el-input v-model="ruleForm.MASTER"  ></el-input>
+            </el-form-item></el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="6">
+            <el-form-item prop="date1"  label="时间" >
+              <el-date-picker type="date" placeholder="选择日期" v-model="ruleForm.date1"></el-date-picker>
+            </el-form-item>
+          </el-col>
+          <el-col :span="6">
+            <el-form-item prop="date2" label-width="50px" label="--" >
+              <el-time-picker type="fixed-time" placeholder="选择时间" v-model="ruleForm.date2" ></el-time-picker>
+            </el-form-item>
+          </el-col>
+          <el-col :span="6">
+            <el-form-item prop="MASTER" label="规模" >
+              <el-input v-model="ruleForm.MASTER"  ></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="6">
+             <el-form-item prop="MASTER" label="服务品牌" >
+              <el-input v-model="ruleForm.MASTER"  ></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-form-item label="即时配送" prop="delivery">
+          <el-switch v-model="ruleForm.delivery"></el-switch>
+        </el-form-item>
+        <el-form-item label="活动性质" prop="type">
+          <el-checkbox-group v-model="ruleForm.type">
+            <el-checkbox label="美食/餐厅线上活动" name="type"></el-checkbox>
+            <el-checkbox label="地推活动" name="type"></el-checkbox>
+            <el-checkbox label="线下主题活动" name="type"></el-checkbox>
+            <el-checkbox label="单纯品牌曝光" name="type"></el-checkbox>
+          </el-checkbox-group>
+        </el-form-item>
+        <el-form-item label="特殊资源" prop="resource">
+          <el-radio-group v-model="ruleForm.resource">
+            <el-radio label="线上品牌商赞助"></el-radio>
+            <el-radio label="线下场地免费"></el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="备注" prop="desc">
+          <el-input type="textarea" v-model="ruleForm.desc"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="submitForm('ruleForm')">立即创建</el-button>
+          <el-button @click="resetForm('ruleForm')">重置</el-button>
+        </el-form-item>
+      </el-form>
+    </el-col>
+  </el-row>
+</template>
+
+<script>
+  export default {
+    data() {
+      return {
+        ruleForm: {
+          name: '',
+          region: '',
+          date1: '',
+          date2: '',
+          delivery: false,
+          type: [],
+          resource: '',
+          desc: '',
+          MASTER: '',
+          PHONE: ''
+        },
+        rules: {
+          name: [
+            { required: true, message: '请输入企业名称', trigger: 'blur' },
+            { min: 0, max: 20, message: '最大 20个字符', trigger: 'blur' }
+          ],
+          region: [
+            { required: true, message: '请选择活动区域', trigger: 'change' }
+          ],
+          date1: [
+            { type: 'date', required: true, message: '请选择日期', trigger: 'change' }
+          ],
+          type: [
+            { type: 'array', required: true, message: '请至少选择一个活动性质', trigger: 'change' }
+          ],
+          resource: [
+            { required: true, message: '请选择活动资源', trigger: 'change' }
+          ]
+        }
+      }
+    },
+    methods: {
+      submitForm(formName) {
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            alert('submit!')
+          } else {
+            console.log('error submit!!')
+            return false
+          }
+        })
+      },
+      resetForm(formName) {
+        this.$refs[formName].resetFields()
+      }
+    }
+  }
+</script>
+
+<style scoped>
+.line{
+  text-align: center;
+}
+</style>
+

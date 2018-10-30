@@ -1,0 +1,29 @@
+<template>
+  <div>
+    <h1>维修厂端</h1>
+    <div class="dashboard-text">name:{{userInfo.loginName}}</div>
+    <div class="dashboard-text">mobile:{{userInfo.mobile}}</div>
+  </div>
+</template>
+
+<script>
+import { mapGetters } from 'vuex'
+
+export default {
+  name: 'dashboard',
+  computed: {
+    ...mapGetters([
+      'userInfo'
+    ])
+  }
+}
+</script>
+
+<style rel="stylesheet/scss" lang="scss" scoped>
+.dashboard {
+  &-text {
+    font-size: 30px;
+    line-height: 46px;
+  }
+}
+</style>

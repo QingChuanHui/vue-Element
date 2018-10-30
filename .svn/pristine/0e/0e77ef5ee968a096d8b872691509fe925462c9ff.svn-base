@@ -1,0 +1,247 @@
+<template>
+  <div>
+  <el-row>
+    <el-col :span="23">
+      <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm"  size="mini" >
+        <el-row>
+          <el-col :span="6">
+            <el-form-item label="机构名称" prop="name">
+              <el-input v-model="ruleForm.name"   ></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12"></el-col>
+        </el-row>
+
+        <el-row>
+          <el-col :span="6">
+            <el-form-item label="上级机构" prop="MASTER">
+              <el-input placeholder="请输入内容" v-model="input5" class="input-with-select" :disabled="true">
+                <el-button @click="openOfficeDialog()" slot="append" icon="el-icon-search">选择</el-button>
+              </el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+        <el-col :span="6">
+          <el-form-item label="负责人" prop="MASTER">
+            <el-input v-model="ruleForm.MASTER"></el-input>
+          </el-form-item>
+        </el-col>
+        </el-row>
+
+        <el-row>
+        <el-col :span="6">
+          <el-form-item label="负责人电话" prop="PHONE">
+            <el-input v-model="ruleForm.PHONE"></el-input>
+          </el-form-item>
+        </el-col>
+        </el-row>
+
+        <el-row>
+          <el-col :span="6">
+            <el-form-item label="地址省" prop="name">
+              <el-select v-model="ruleForm.region" placeholder="请选择省">
+                <el-option label="vip" value="vip"></el-option>
+                <el-option label="客户2" value="kehu2"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="6">
+            <el-form-item label="地址市" prop="name">
+              <el-select v-model="ruleForm.region" placeholder="请选择市">
+                <el-option label="vip" value="vip"></el-option>
+                <el-option label="客户2" value="kehu2"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="6">
+            <el-form-item label="地址县" prop="name">
+              <el-select v-model="ruleForm.region" placeholder="请选择县">
+                <el-option label="vip" value="vip"></el-option>
+                <el-option label="客户2" value="kehu2"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+
+        </el-row>
+
+        <el-row>
+        <el-col :span="6">
+          <el-form-item prop="MASTER" label="街道地址" >
+            <el-input v-model="ruleForm.MASTER"  ></el-input>
+          </el-form-item></el-col>
+        </el-row>
+
+        <el-row>
+          <el-col :span="6">
+            <el-form-item prop="master" label="管理员账号" >
+              <el-input v-model="ruleForm.master"  ></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="6">
+            <el-form-item prop="master2" label="管理员密码" >
+              <el-input v-model="ruleForm.MASTER"  ></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="6">
+        <el-form-item label="备注" prop="desc">
+          <el-input type="textarea" v-model="ruleForm.desc"></el-input>
+        </el-form-item>
+          </el-col>
+        </el-row>
+        <el-form-item>
+          <el-button type="primary" @click="submitForm('ruleForm')">立即创建</el-button>
+          <el-button @click="resetForm('ruleForm')">重置</el-button>
+        </el-form-item>
+      </el-form>
+    </el-col>
+  </el-row>
+
+    <el-dialog title="组织机构" :visible.sync="dialogTableVisible">
+      <el-input
+        placeholder="输入关键字进行过滤"
+        v-model="filterText">
+      </el-input>
+      <el-tree
+        class="filter-tree"
+        show-checkbox
+        :data="data2"
+        :props="defaultProps"
+        default-expand-all
+        check-strictly="true"
+        :filter-node-method="filterNode"
+        ref="tree2">
+      </el-tree>
+
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+      </div>
+    </el-dialog>
+
+  </div>
+</template>
+
+<script>
+  import { loginNameUniqueness } from '@/api/system/office/index'
+  export default {
+    watch: {
+      filterText(val) {
+        this.$refs.tree2.filter(val)
+      }
+    },
+    data() {
+      var validateMaster = (rule, value, callback) => {
+        console.log(value)
+        if (value === '') {
+          callback(new Error('请输入管理员账号'))
+        }
+        loginNameUniqueness({ 'loginName': value }).then(response => {
+          if (response.new) {
+            callback(new Error('该账号已经被使用'))
+          } else {
+            callback()
+          }
+        })
+      }
+      return {
+        dialogTableVisible: false,
+        filterText: '',
+        data2: [{
+          id: 1,
+          label: '一级 1',
+          children: [{
+            id: 4,
+            label: '二级 1-1',
+            children: [{
+              id: 9,
+              label: '三级 1-1-1'
+            }, {
+              id: 10,
+              label: '三级 1-1-2'
+            }]
+          }]
+        }, {
+          id: 2,
+          label: '一级 2',
+          children: [{
+            id: 5,
+            label: '二级 2-1'
+          }, {
+            id: 6,
+            label: '二级 2-2'
+          }]
+        }, {
+          id: 3,
+          label: '一级 3',
+          children: [{
+            id: 7,
+            label: '二级 3-1'
+          }, {
+            id: 8,
+            label: '二级 3-2'
+          }]
+        }],
+        defaultProps: {
+          children: 'children',
+          label: 'label'
+        },
+        ruleForm: {
+          name: '',
+          region: '',
+          date1: '',
+          date2: '',
+          delivery: false,
+          type: [],
+          resource: '',
+          desc: '',
+          master: '',
+          PHONE: ''
+        },
+        rules: {
+          name: [
+            { required: true, message: '请输入企业名称', trigger: 'blur' },
+            { min: 0, max: 20, message: '最大 64个字符', trigger: 'blur' }
+          ],
+          master: [
+            { validator: validateMaster, trigger: 'blur' }
+          ]
+        }
+      }
+    },
+    methods: {
+      submitForm(formName) {
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            alert('submit!')
+          } else {
+            console.log('error submit!!')
+            return false
+          }
+        })
+      },
+      resetForm(formName) {
+        this.$refs[formName].resetFields()
+      },
+      openOfficeDialog() {
+        // 打开机构树形dialog
+        this.dialogTableVisible = true
+      },
+      filterNode(value, data) {
+        if (!value) return true
+        return data.label.indexOf(value) !== -1
+      }
+    }
+  }
+</script>
+
+<style scoped>
+  .line{
+    text-align: center;
+  }
+</style>
+

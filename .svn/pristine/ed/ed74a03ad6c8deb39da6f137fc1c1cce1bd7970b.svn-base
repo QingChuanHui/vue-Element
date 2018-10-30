@@ -1,0 +1,315 @@
+<template>
+  <div>
+    <el-alert
+            title="维修企业区分与维修门店，一家企业可以拥有多个门店"
+            type="success" style="margin-bottom:20px"
+            >
+     </el-alert>
+  <el-row>
+        
+    <el-col :span="23">
+       
+      <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm"  size="mini" >
+        <el-row>
+          <el-col :span="10">
+            <el-form-item label="机构名称" prop="officeName">
+              <el-input placeholder="请输入内容" v-model="ruleForm.officeName" class="input-with-select" :disabled="true">
+                <el-button @click="openOfficeDialog()" slot="append" icon="el-icon-search">选择</el-button>
+              </el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-row>
+        <el-col :span="10">
+          <el-form-item label="企业名称" prop="master">
+            <el-input v-model="ruleForm.master"></el-input>
+          </el-form-item>
+        </el-col>
+        </el-row>
+
+        <el-row>
+        <el-col :span="10">
+          <el-form-item label="企业负责人" prop="phone">
+            <el-input v-model="ruleForm.phone"></el-input>
+          </el-form-item>
+        </el-col>
+        </el-row>
+
+        <el-row>
+        <el-col :span="10">
+          <el-form-item label="负责人电话" prop="phone">
+            <el-input v-model="ruleForm.phone"></el-input>
+          </el-form-item>
+        </el-col>
+        </el-row>
+
+        <el-row>
+          <el-col :span="4">
+            <el-form-item label="地址省" prop="province">
+              <el-select v-model="ruleForm.province" filterable @change="onProvinceChange" placeholder="请选择省">
+                <el-option v-for="(item,index) in provinceTree" :key="index"  :label="item.name" :value="item.name"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="3">
+            <el-form-item label="地址市"  prop="city">
+              <el-select v-model="ruleForm.city" filterable  @change="onCityChange"  placeholder="请选择市">
+                <el-option v-for="(item,index) in cityTree" :key="index"  :label="item.name" :value="item.name"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="3">
+            <el-form-item label="地址县"   prop="county">
+              <el-select v-model="ruleForm.county" filterable placeholder="请选择县">
+                <el-option v-for="(item,index) in countyTree" :key="index"  :label="item.name" :value="item.name"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-row>
+        <el-col :span="10">
+          <el-form-item prop="address" label="街道地址" >
+            <el-input v-model="ruleForm.address"  ></el-input>
+          
+          </el-form-item></el-col>
+          <el-col style="margin-left:10px" :span="3">
+            <el-button  type="primary"  icon="el-icon-plus" v-permission="'base:client:add'" size="mini"  @click="addT()" >地图选点</el-button>
+          </el-col>
+        </el-row>
+
+        <el-row>
+          <el-col :span="10">
+            <el-form-item prop="adminName" label="管理员账号" >
+              <el-input v-model="ruleForm.adminName"  ></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="10">
+            <el-form-item prop="adminPassword" label="管理员密码" >
+              <el-input v-model="ruleForm.adminPassword"  ></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+       
+        <el-row>
+          <el-col :span="10">
+        <el-form-item label="备注" prop="remarks">
+          <el-input type="textarea" v-model="ruleForm.remarks"></el-input>
+        </el-form-item>
+          </el-col>
+        </el-row>
+        <el-form-item v-if="flag!=0">
+          <el-button type="primary" @click="submitForm('ruleForm')">保存</el-button>
+          <el-button @click="resetForm('ruleForm')">重置</el-button>
+        </el-form-item>
+      </el-form>
+    </el-col>
+  </el-row>
+
+    <el-dialog title="组织机构" :visible.sync="dialogTableVisible">
+      <el-input
+        placeholder="输入关键字进行过滤"
+        v-model="filterText">
+      </el-input>
+      <el-tree
+        class="filter-tree"
+        :data="officeTree"
+        :props="defaultProps"
+        default-expand-all
+        highlight-current
+        :filter-node-method="filterNode"
+        @node-click="handleNodeClick"
+        ref="tree">
+      </el-tree>
+
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogTableVisible = false" v-loading.fullscreen.lock="fullscreenLoading">取 消</el-button>
+        <el-button type="primary" @click="selectOffice">确 定</el-button>
+      </div>
+    </el-dialog>
+
+    <el-dialog title="地图" :visible.sync="dialogMapperVisible">
+        <div id="XSDFXPage" class="XSDFXPage"></div>
+    </el-dialog>
+    <!-- <b-map-component></b-map-component> -->
+  </div>
+</template>
+
+<script>
+  import { getOfficeTreeData } from '@/api/system/office/index'
+  import { loginNameUniqueness } from '@/api/system/user/index'
+  import { getAreaListTree } from '@/api/system/area/index'
+  import { updateClient, insertClient, selectClientById } from '@/api/base/client/index'
+  // import BMapComponent from '@/components/BMapComponent/BMapComponent'
+  export default {
+    components: {},
+    watch: {
+      filterText(val) {
+        this.$refs.tree.filter(val)
+      }
+    },
+    data() {
+      var validateMaster = (rule, value, callback) => {
+        if (value === '') {
+          callback(new Error('请输入管理员账号'))
+        }
+        if (this.flag === 2) {
+          this.flagUpdate = true
+        }
+        loginNameUniqueness({ 'loginName': value, 'flag': this.flagUpdate }).then(response => {
+          if (response.new) {
+            callback(new Error('该账号已经被使用'))
+          } else {
+            callback()
+          }
+        })
+      }
+      return {
+        flagUpdate: false,
+        id: '',
+        flag: 0,
+        dialogTableVisible: false,
+        dialogMapperVisible: false,
+        fullscreenLoading: false,
+        filterText: '',
+        treeSelectData: {
+          treeKey: '',
+          treeValue: ''
+        },
+        officeTree: [],
+        provinceTree: [],
+        cityTree: [],
+        countyTree: [],
+        defaultProps: {
+          children: 'children',
+          label: 'label'
+        },
+        ruleForm: {
+        },
+        rules: {
+          officeName: { required: true, message: '机构名称不允许为空', trigger: 'blur' },
+          clientName: { required: true, message: '企业名称不允许为空', trigger: 'blur' },
+          adminName: [
+            { validator: validateMaster, trigger: 'blur' }
+          ]
+        }
+      }
+    },
+    mounted: function() {
+      this.$nextTick(function() {
+        // flag==0 表示查看 flag=1表示需改
+        this.id = this.$route.query.id
+        if (this.id) {
+          this.load()
+        }
+        this.flag = Number.parseInt(this.$route.query.flag)
+        this.getTreeData()
+        this.getAreaData(1, '')
+      })
+    },
+    methods: {
+      submitForm(formName) {
+        // 提交form
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            // 新增 flag===1
+            if (this.flag === 1) {
+              insertClient(this.ruleForm).then(response => {
+                console.log('ok')
+                this.$router.push({ path: 'Client' })
+              })
+            // 修改 flag===2
+            } else if (this.flag === 2) {
+              updateClient(this.ruleForm).then(response => {
+                console.log('ok')
+                this.$router.push({ path: 'Client' })
+              })
+            } else {
+              console.log('error submit!!:' + this.flag)
+            }
+          } else {
+            console.log('error submit!!')
+            return false
+          }
+        })
+      },
+      resetForm(formName) {
+        // 重置表单
+        this.$refs[formName].resetFields()
+      },
+      openOfficeDialog() {
+        // 打开机构树形dialog
+        this.dialogTableVisible = true
+      },
+      filterNode(value, data) {
+        // 对树节点进行筛选时执行的方法，返回 true 表示这个节点可以显示，返回 false 则表示这个节点会被隐藏
+        if (!value) return true
+        return data.label.indexOf(value) !== -1
+      },
+      openFullScreen() {
+        this.fullscreenLoading = true
+        setTimeout(() => {
+          this.fullscreenLoading = false
+        }, 2000)
+      },
+      load() {
+        selectClientById({ 'id': this.id }).then(response => {
+          this.ruleForm = response.new
+        })
+      },
+      getAreaData(kind, name) {
+        // 获取地区信息
+        getAreaListTree({ 'name': name }).then(response => {
+          if (kind === 1) {
+            this.provinceTree = response.newList
+          } else if (kind === 2) {
+            this.cityTree = response.newList
+          } else {
+            console.log(response.newList)
+            this.countyTree = response.newList
+          }
+        })
+      },
+      getTreeData() {
+        getOfficeTreeData().then(response => {
+          this.officeTree = response.newList
+          console.log(this.officeTree)
+        })
+      },
+      onProvinceChange(ele) {
+        console.log(ele)
+        this.ruleForm.city = ''
+        this.ruleForm.county = ''
+        // 当选择省份以后 获取这个省份下面的所有城市
+        this.getAreaData(2, ele)
+      },
+      onCityChange(ele) {
+        console.log(ele)
+        this.ruleForm.county = ''
+        this.getAreaData(3, ele)
+      },
+      selectOffice() {
+        // 点击确定以后先关闭当前界面
+        this.dialogTableVisible = false
+        if (this.treeSelectData.treeKey) {
+          this.ruleForm.officeId = this.treeSelectData.treeKey
+          this.ruleForm.officeName = this.treeSelectData.treeValue
+        }
+      },
+      handleNodeClick(data) {
+        this.treeSelectData.treeKey = data.id
+        this.treeSelectData.treeValue = data.label
+      }
+    }
+  }
+</script>
+
+<style scoped>
+  .line{
+    text-align: center;
+  }
+</style>
+

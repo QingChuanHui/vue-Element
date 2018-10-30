@@ -1,0 +1,153 @@
+<template>
+  <div>
+    <el-alert
+            title="如果想做保养推荐，项目编码请输入力洋保养项目的ID"
+            type="success" style="margin-bottom:20px"
+            >
+     </el-alert>
+  <el-row>
+    <el-col :span="23">
+      <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm"  size="mini" >
+
+        <el-row>
+        <el-col :span="10">
+          <el-form-item label="项目编码" prop="itemCode">
+            <el-input v-model="ruleForm.itemCode"></el-input>
+          </el-form-item>
+        </el-col>
+        </el-row>
+
+        <el-row>
+        <el-col :span="10">
+          <el-form-item label="项目名称" prop="itemName">
+            <el-input v-model="ruleForm.itemName"></el-input>
+          </el-form-item>
+        </el-col>
+        </el-row>
+        
+       <el-row>
+         <el-col :span="10">
+           <el-form-item label="项目类别" prop="type">
+                <el-select v-model="ruleForm.type" clearable placeholder="请选择项目类别">
+                      <el-option v-for="(item,index) in itemTypeData" :key="index"  :label="item.label" :value="item.value"></el-option>
+                </el-select>
+            </el-form-item>
+          </el-col>
+       </el-row>
+
+        <el-row>
+          <el-col :span="10">
+            <el-form-item label="备注" prop="remarks">
+              <el-input type="textarea" v-model="ruleForm.remarks"></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+
+        <el-form-item>
+          <el-button type="primary" @click="submitForm('ruleForm')">保存</el-button>
+          <el-button @click="resetForm('ruleForm')">重置</el-button>
+        </el-form-item>
+      </el-form>
+    </el-col>
+  </el-row>
+
+   
+  </div>
+</template>
+
+<script>
+  import { insertItem, selectItemById, updateItem } from '@/api/base/item/index'
+  import { getDictList } from '@/api/system/dict/index'
+  // import { loginNameUniqueness } from '@/api/system/user/index'
+  export default {
+    watch: {
+      filterText(val) {
+        this.$refs.tree.filter(val)
+      }
+    },
+    data() {
+      return {
+        id: '',
+        flag: 0,
+        itemTypeData: [],
+        ruleForm: {
+          id: '',
+          itemCode: '',
+          itemName: '',
+          type: '',
+          remarks: ''
+        },
+        rules: {
+          itemName: { required: true, message: '项目名称不允许为空', trigger: 'blur' }
+        }
+      }
+    },
+    mounted: function() {
+      this.$nextTick(function() {
+        // flag==0 表示查看 flag=1表示需改
+        this.id = this.$route.query.id
+        this.flag = Number.parseInt(this.$route.query.flag)
+        if (this.$route.query.type) {
+          this.ruleForm.type = this.$route.query.type
+        }
+        this.getItemType()
+        if (this.id) {
+          this.load()
+        }
+      })
+    },
+    methods: {
+      submitForm(formName) {
+        // 提交form
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            // 新增 flag===1
+            if (this.flag === 1) {
+              insertItem(this.ruleForm).then(response => {
+                console.log('ok')
+                this.$router.push({ path: '/base/Item' })
+              })
+            // 修改 flag===2
+            } else if (this.flag === 2) {
+              updateItem(this.ruleForm).then(response => {
+                console.log('ok')
+                this.$router.push({ path: '/base/Item' })
+              })
+            } else {
+              console.log('error submit!!:' + this.flag)
+            }
+          } else {
+            console.log('error submit!!')
+            return false
+          }
+        })
+      },
+      resetForm(formName) {
+        // 重置表单
+        this.$refs[formName].resetFields()
+      },
+      load() {
+        selectItemById({ 'id': this.id }).then(response => {
+          console.log(response.new)
+          this.ruleForm = response.new
+          // this.ruleForm.type = response.new.type.toString()
+          // this.getItemType()
+        })
+      },
+      getItemType() {
+        const itemTypeQuery = { 'type': 'itemType' }
+        getDictList(itemTypeQuery).then(response => {
+          this.itemTypeData = response.newList
+        })
+      }
+    }
+  }
+</script>
+
+<style scoped>
+  .line{
+    text-align: center;
+  }
+</style>
+

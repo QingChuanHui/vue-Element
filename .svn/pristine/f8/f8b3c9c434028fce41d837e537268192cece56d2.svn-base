@@ -1,0 +1,338 @@
+const manage = {
+  path: '/manage',
+  component: resolve => require(['../views/layout/Layout'], resolve),
+  redirect: '/manage/Carousel',
+  name: 'operation',
+  meta: {
+    title: '运营',
+    icon: 'iconfont icon-msnui-operate'
+  },
+  children: [
+    {
+      path: 'Carousel',
+      name: 'operation:carousel:list',
+      component: resolve => require(['@/views/manage/carousel/list'], resolve),
+      meta: { title: '轮播图维护', fitHeight: 0, breadcrumb: [{ title: '轮播图维护', path: '/manage/Carousel' }], parentpath: '/manage/Carousel' }
+    },
+    {
+      path: 'carouselAdd',
+      name: 'operation:carousel:add',
+      hidden: true,
+      component: resolve => require(['@/views/manage/carousel/edit'], resolve),
+      meta: {
+        title: '新增',
+        fitHeight: 0,
+        breadcrumb: [{
+          title: '轮播图维护',
+          path: '/manage/Carousel'
+        }, {
+          title: '新增',
+          path: '/manage/carouselAdd'
+        }],
+        parentpath: '/manage/Carousel'
+      }
+    },
+    {
+      path: 'carouselEdit',
+      name: 'operation:carousel:edit',
+      hidden: true,
+      component: resolve => require(['@/views/manage/carousel/edit'], resolve),
+      meta: {
+        title: '编辑',
+        fitHeight: 0,
+        breadcrumb: [{
+          title: '轮播图维护',
+          path: '/manage/Carousel'
+        }, {
+          title: '编辑',
+          path: '/manage/carouselEdit'
+        }],
+        parentpath: '/manage/Carousel'
+      }
+    },
+    {
+      path: 'carouselWatch',
+      name: 'operation:carousel:view',
+      hidden: true,
+      component: resolve => require(['@/views/manage/carousel/edit'], resolve),
+      meta: {
+        title: '查看',
+        fitHeight: 0,
+        breadcrumb: [{
+          title: '轮播图维护',
+          path: '/manage/Carousel'
+        }, {
+          title: '查看',
+          path: '/manage/carouselWatch'
+        }],
+        parentpath: '/manage/Carousel'
+      }
+    },
+    // {
+    //   path: 'HomeKind',
+    //   name: 'HomeKind',
+    //   // hidden: true,
+    //   component: resolve => require(['@/views/manage/HomeKindList'], resolve),
+    //   meta: { title: '首页类别', fitHeight: 0, breadcrumb: [{ title: '首页类别', path: '/manage/HomeKind' }], parentpath: '/manage/HomeKind' }
+    // },
+    {
+      path: 'NewsList',
+      name: 'operation:news:list',
+      component: resolve => require(['@/views/manage/news/list'], resolve),
+      meta: { title: '头条维护', fitHeight: 0, breadcrumb: [{ title: '头条维护', path: '/manage/NewsList' }], parentpath: '/manage/NewsList' }
+    },
+    {
+      path: 'NewsAdd',
+      name: 'operation:news:add',
+      hidden: true,
+      component: resolve => require(['@/views/manage/news/edit'], resolve),
+      meta: {
+        title: '新增',
+        fitHeight: 0,
+        breadcrumb: [{
+          title: '头条维护',
+          path: '/manage/NewsList'
+        },
+        {
+          title: '新增',
+          path: '/manage/NewsAdd'
+        }],
+        parentpath: '/manage/NewsList'
+      }
+    },
+    {
+      path: 'NewsEdit',
+      name: 'operation:news:edit',
+      hidden: true,
+      component: resolve => require(['@/views/manage/news/edit'], resolve),
+      meta: {
+        title: '编辑',
+        fitHeight: 0,
+        breadcrumb: [{
+          title: '头条维护',
+          path: '/manage/NewsList'
+        },
+        {
+          title: '编辑',
+          path: '/manage/NewsEdit'
+        }
+        ],
+        parentpath: '/manage/NewsList'
+      }
+    },
+    {
+      path: 'NewsWatch',
+      name: 'operation:news:view',
+      hidden: true,
+      component: resolve => require(['@/views/manage/news/edit'], resolve),
+      meta: {
+        title: '查看',
+        fitHeight: 0,
+        breadcrumb: [{
+          title: '头条维护',
+          path: '/manage/NewsList'
+        },
+        {
+          title: '查看',
+          path: '/manage/NewsWatch'
+        }
+        ],
+        parentpath: '/manage/NewsList'
+      }
+    },
+    {
+      path: 'KindList',
+      name: 'operation:kind:list',
+      component: resolve => require(['@/views/manage/homeKind/list'], resolve),
+      meta: {
+        title: '类别维护',
+        fitHeight: 0,
+        breadcrumb: [{
+          title: '类别维护',
+          path: '/manage/KindList'
+        }],
+        parentpath: '/manage/KindList'
+      }
+    }, {
+      path: 'KindAdd',
+      name: 'operation:kind:add',
+
+      hidden: true,
+      component: resolve => require(['@/views/manage/homeKind/edit'], resolve),
+      meta: {
+        title: '新增',
+        fitHeight: 0,
+        breadcrumb: [{
+          title: '类别维护',
+          path: '/manage/KindList'
+
+        },
+        {
+          title: '新增',
+          path: '/manage/KindAdd'
+        }
+        ],
+        parentpath: '/manage/KindList'
+
+      }
+    }, {
+      path: 'KindEdit',
+      name: 'operation:kind:edit',
+      hidden: true,
+      component: resolve => require(['@/views/manage/homeKind/edit'], resolve),
+      meta: {
+        title: '编辑',
+        fitHeight: 0,
+        breadcrumb: [{
+          title: '类别维护',
+          path: '/manage/KindList'
+        },
+        {
+          title: '编辑',
+          path: '/manage/KindEdit'
+        }
+        ],
+        parentpath: '/manage/KindList'
+      }
+    }, {
+      path: 'KindWatch',
+      name: 'operation:kind:view',
+      hidden: true,
+      component: resolve => require(['@/views/manage/homeKind/edit'], resolve),
+      meta: {
+        title: '查看',
+        fitHeight: 0,
+        breadcrumb: [{
+          title: '类别维护',
+          path: '/manage/KindList'
+        },
+        {
+          title: '查看',
+          path: '/manage/KindWatch'
+        }
+        ],
+        parentpath: '/manage/KindList'
+
+      }
+    },
+    {
+      path: 'CouponList',
+      name: 'operation:coupon:list',
+      component: resolve => require(['@/views/manage/coupon/list'], resolve),
+      meta: {
+        title: '优惠券维护',
+        fitHeight: 0,
+        breadcrumb: [{
+          title: '类别维护',
+          path: '/manage/CouponList'
+        }],
+        parentpath: '/manage/CouponList'
+      }
+    },
+    {
+      path: 'CouponAdd',
+      name: 'operation:coupon:add',
+      hidden: true,
+      component: resolve => require(['@/views/manage/coupon/edit'], resolve),
+      meta: {
+        title: '新增优惠券',
+        fitHeight: 0,
+        breadcrumb: [{
+          title: '类别维护',
+          path: '/manage/CouponList'
+        },
+        {
+          title: '新增优惠券',
+          path: '/manage/CouponAdd'
+        }],
+        parentpath: '/manage/CouponList'
+      }
+    },
+    {
+      path: 'CouponEdit',
+      name: 'operation:coupon:edit',
+      hidden: true,
+      component: resolve => require(['@/views/manage/coupon/edit'], resolve),
+      meta: {
+        title: '编辑优惠券',
+        fitHeight: 0,
+        breadcrumb: [{
+          title: '类别维护',
+          path: '/manage/CouponList'
+        },
+        {
+          title: '编辑优惠券',
+          path: '/manage/CouponAdd'
+        }],
+        parentpath: '/manage/CouponList'
+      }
+    },
+    {
+      path: 'CouponWatch',
+      name: 'operation:coupon:view',
+      hidden: true,
+      component: resolve => require(['@/views/manage/coupon/edit'], resolve),
+      meta: {
+        title: '查看优惠券',
+        fitHeight: 0,
+        breadcrumb: [{
+          title: '类别维护',
+          path: '/manage/CouponList'
+        },
+        {
+          title: '查看优惠券',
+          path: '/manage/CouponAdd'
+        }],
+        parentpath: '/manage/CouponList'
+      }
+    },
+    {
+      path: 'feedbackList',
+      name: 'operation:feedback:list',
+      component: resolve => require(['@/views/manage/feedback/list'], resolve),
+      meta: {
+        title: '反馈管理',
+        fitHeight: 0,
+        breadcrumb: [{
+          title: '反馈管理',
+          path: '/manage/feedbackList'
+        }],
+        parentpath: '/manage/feedbackList'
+      }
+    },
+    {
+      path: 'orderList',
+      name: 'operation:order:list',
+      component: resolve => require(['@/views/manage/order/list'], resolve),
+      meta: {
+        title: '订单管理',
+        fitHeight: 0,
+        breadcrumb: [{
+          title: '订单管理',
+          path: '/manage/orderList'
+        }],
+        parentpath: '/manage/orderList'
+      }
+    },
+    {
+      path: 'orderEdit',
+      name: 'operation:order:edit',
+      hidden: true,
+      component: resolve => require(['@/views/manage/order/edit'], resolve),
+      meta: {
+        title: '订单详情',
+        fitHeight: 0,
+        breadcrumb: [{
+          title: '订单管理',
+          path: '/manage/orderList'
+        },
+        {
+          title: '订单详情',
+          path: '/manage/orderEdit'
+        }],
+        parentpath: '/manage/orderList'
+      }
+    }
+  ]
+}
+export default manage
